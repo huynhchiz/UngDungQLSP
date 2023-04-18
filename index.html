@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sản phẩm</title>
+    <style>
+        .addProduct {
+            width: 400px;
+            height: 70px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            background-color: rgb(201, 206, 206);
+        }
+        
+        #productName {
+            width: 250px;
+            height: 24px;
+        }
+
+        button {
+            background-color: green;
+            color: white;
+            border: 0px solid;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        #add-button {
+            margin-left: 8px;
+        }
+
+        .mybutton {
+            margin-left: 32px;
+        }
+
+
+        .titleListProduct {
+            height: 40px;
+            font-weight: bolder;
+        }
+
+        #countProduct {
+            float: right;
+            color: red
+        }
+
+        .productItem, .titleListProduct {
+            width: 450px;
+            padding: 8px 0px;
+        }
+
+        .productItemName {
+            display: inline-block;
+            width: 250px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>ỨNG DỤNG QUẢN LÝ SẢN PHẨM</h1>
+    <h2>Add New Product</h2>
+    <div class="addProduct">
+        <input type="text" id="productName" placeholder="New Product">
+        <button type="button" id="add-button" onclick="addNewProduct()">Add</button>
+    </div>
+
+    <div>
+        <h2>Display All Product</h2>
+        <div class="titleListProduct">
+            <span id="tableName">Product Name</span>
+            <span id="countProduct">0</span>
+        </div>
+
+        <div id="listProduct"></div>
+    </div>
+
+    <script>
+        let listProduct = [
+            {
+                id: uuid(),
+                name: "Samsung Note 21"
+            },
+            {
+                id: uuid(),
+                name: "Iphone 14 Pro Max 256Gb"
+            }
+        ];
+        document.getElementById('countProduct').innerHTML = listProduct.length + ' products';
+
+        function uuid() {
+            var temp_url = URL.createObjectURL(new Blob());
+            var uuid = temp_url.toString();
+            URL.revokeObjectURL(temp_url);
+            return uuid.substr(uuid.lastIndexOf('/') + 1);
+        }
+
+        function addNewProduct() {
+            let productName = document.getElementById('productName').value.trim();
+            if (productName !== '') {
+                let newObj = {
+                    id: uuid(),
+                    name: productName
+                };
+                listProduct.push(newObj);
+                console.log(listProduct);
+                document.getElementById('productName').value = '';
+                document.getElementById('countProduct').innerHTML = listProduct.length + ' products';
+                displayOneProduct(newObj.id, newObj.name);
+            }
+        }
+
+        function findProductById(myuuid) {
+            for (let index in listProduct) {
+                if (listProduct[index].id === myuuid) {
+                    return index;
+                }
+            }
+            return -1;//không tìm thấy
+        }
+
+        function displayOneProduct(index, productName) {
+            //display product item
+            let createNewProductDiv = document.createElement("div")
+            createNewProductDiv.id = index;
+            createNewProductDiv.className = 'productItem';
+
+            //display product name
+            let createNewSpan = document.createElement("span")
+            createNewSpan.innerHTML = productName;
+            createNewSpan.className = 'productItemName'
+            createNewProductDiv.appendChild(createNewSpan)
+
+            //click on product name -> show value input
+            let inputProductName = document.getElementById('productName');
+            createNewSpan.onclick = function() {
+                inputProductName.value = productName;
+            }
+
+            //display edit btn
+            let editBtn = document.createElement("button");
+            editBtn.innerHTML = "Edit";
+            editBtn.className = "mybutton";
+            createNewProductDiv.appendChild(editBtn);
+
+            editBtn.onclick = function() {
+                let editProductName = document.getElementById('productName').value
+                if (editProductName !== '') {
+                    createNewSpan.innerHTML = editProductName;
+                    document.getElementById('productName').value = '';
+                }
+            }
+
+            //display delete btn
+            let deleteBtn = document.createElement("button");
+            deleteBtn.innerHTML = "Delete";
+            deleteBtn.className = "mybutton";
+            createNewProductDiv.appendChild(deleteBtn);
+
+            deleteBtn.onclick = function () {
+                createNewProductDiv.remove();
+                listProduct.splice(findProductById(index), 1)
+                console.log(listProduct);
+                document.getElementById('countProduct').innerHTML = listProduct.length + ' products';
+            }
+
+            //tạo thẻ div product item trong thẻ div listProduct
+            document.getElementById("listProduct").appendChild(createNewProductDiv);
+        }
+
+        function displayProduct() {
+            for (let index in listProduct) {
+                displayOneProduct(listProduct[index].id, listProduct[index].name);
+            }
+        }
+        displayProduct();
+    </script>
+</body>
+
+</html>
